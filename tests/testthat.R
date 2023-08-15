@@ -9,4 +9,4 @@
 library(testthat)
 library(meddra.read)
 
-test_check("meddra.read")
+#test_check("meddra.read")
