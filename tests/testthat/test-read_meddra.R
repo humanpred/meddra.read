@@ -29,6 +29,35 @@ test_that("read_meddra", {
     read_meddra(test_path("data/unique_medseq_23.1")),
     empty_example
   )
+  # Loading file with last column empty works
+  filled_col_example <-
+    list(
+      hlgt.asc = data.frame(hlgt_code = logical(0), hlgt_name = logical(0)),
+      smq_list.asc =
+        data.frame(
+          smq_code = 1L, smq_name = "foo", smq_level = "foo",
+          smq_description = "example foo", smq_source = "foo",
+          smq_note = "notable foo", MedDRA_version = 10, status = "Y",
+          smq_algorithm = "N"
+        ),
+      hlgt.seq =
+        data.frame(
+          hlgt_version_date = logical(0),
+          hlgt_action_code = logical(0), hlgt_mod_fld_num = logical(0),
+          hlgt_code = logical(0), hlgt_name = logical(0), hlgt_whoart_code = logical(0),
+          hlgt_harts_code = logical(0), hlgt_costart_sym = logical(0),
+          hlgt_icd9_code = logical(0), hlgt_icd9cm_code = logical(0),
+          hlgt_icd10_code = logical(0), hlgt_jart_code = logical(0)
+        )
+    )
+  expect_silent(
+    read_meddra(test_path("data/last_column"))
+  )
+  expect_equal(
+    read_meddra(test_path("data/last_column")),
+    filled_col_example
+  )
+
   # Loading file with last column filled works
   filled_example <-
     list(
