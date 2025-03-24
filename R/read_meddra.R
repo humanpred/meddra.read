@@ -81,12 +81,32 @@ colnames_meddra_files <-
 meddra_data_in_last_column <- c("meddra_history_english.asc")
 
 read_meddra_file <- function(filename) {
-  ret <- read.delim(file = filename, header = FALSE, sep = "$")
   # Assign names based on the column names from
   # dist_file_format_25_1_English.pdf
   current_colnames <- colnames_meddra_files[[basename(filename)]]
   if (is.null(current_colnames)) {
     stop("Could not find column names for ", filename) # nocov
+  }
+
+  file_text <- readLines(filename, warn = FALSE)
+  if (length(file_text) == 0) {
+    # Some files (at least hlgt.seq in version 28.0) may be empty, create a
+    # zero-row data.frame for those.
+    ret <-
+      data.frame(matrix(
+        data = vector(),
+        nrow = 0, ncol = length(current_colnames),
+        dimnames = list(c(), current_colnames)
+      ))
+  } else {
+    ret <-
+      read.delim(
+        # Some files (at least meddra_release.asc in version 28.0) are missing
+        # newlines at the end, this suppresses a warning about that.
+        text = file_text,
+        header = FALSE,
+        sep = "$"
+      )
   }
 
   # According to the MedDRA standard (dist_file_format_25_1_English.pdf, section
@@ -96,9 +116,9 @@ read_meddra_file <- function(filename) {
   # Except, it's not true for a few files.
   if (basename(filename) %in% meddra_data_in_last_column) {
     # do nothing
-  } else if (all(is.na(ret[[ncol(ret)]]))) {
+  } else if (nrow(ret) > 0 && all(is.na(ret[[ncol(ret)]]))) {
     ret[[ncol(ret)]] <- NULL
-  } else {
+  } else if (nrow(ret) > 0) {
     stop("The last column should be NA in file: ", filename) # nocov
   }
   if (ncol(ret) != length(current_colnames)) {
