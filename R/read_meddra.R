@@ -21,7 +21,7 @@ read_meddra <- function(directory) {
 read_meddra_dir <- function(directory, extension) {
   files <- list.files(directory, full.names = TRUE, pattern = sprintf("\\.%s$", extension))
   stopifnot(length(files) > 0)
-  files <- setNames(files, tolower(basename(files)))[order(tolower(basename(files)))]
+  files <- stats::setNames(files, tolower(basename(files)))[order(tolower(basename(files)))]
   lapply(X = files, FUN = read_meddra_file)
 }
 
@@ -121,7 +121,7 @@ read_meddra_file <- function(filename) {
       ))
   } else {
     ret <-
-      read.delim(
+      utils::read.delim(
         # Some files (at least meddra_release.asc in version 28.0) are missing
         # newlines at the end, this suppresses a warning about that.
         text = file_text,

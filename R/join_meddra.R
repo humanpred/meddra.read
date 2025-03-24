@@ -6,14 +6,12 @@
 #'   "pt_soc_code", "llt_code", "llt_name", and "llt_currency"
 #' @export
 join_meddra <- function(data) {
-  ret <-
-    data$soc.asc |>
-    dplyr::left_join(data$soc_hlgt.asc, by = "soc_code") |>
-    dplyr::left_join(data$hlgt.asc, by = "hlgt_code") |>
-    dplyr::left_join(data$hlgt_hlt.asc, by = "hlgt_code") |>
-    dplyr::left_join(data$hlt.asc, by = "hlt_code") |>
-    dplyr::left_join(data$hlt_pt.asc, by = "hlt_code") |>
-    dplyr::left_join(data$pt.asc, by = "pt_code") |>
-    dplyr::left_join(data$llt.asc, by = "pt_code")
+  ret <- dplyr::left_join(data$soc.asc, data$soc_hlgt.asc, by = "soc_code")
+  ret <- dplyr::left_join(ret, data$hlgt.asc, by = "hlgt_code")
+  ret <- dplyr::left_join(ret, data$hlgt_hlt.asc, by = "hlgt_code")
+  ret <- dplyr::left_join(ret, data$hlt.asc, by = "hlt_code")
+  ret <- dplyr::left_join(ret, data$hlt_pt.asc, by = "hlt_code")
+  ret <- dplyr::left_join(ret, data$pt.asc, by = "pt_code")
+  ret <- dplyr::left_join(ret, data$llt.asc, by = "pt_code")
   ret
 }
