@@ -1,12 +1,13 @@
 Package: meddra.read
-Title: Load and Merge MedDRA Data for Clinical Trials
-Version: 0.0.0.9000
+Title: Load and Use MedDRA Data for Clinical Trials
+Version: 0.0.1
 Authors@R: 
     person("Bill", "Denney", email="wdenney@humanpredictions.com", role=c("aut", "cre"), comment=c(ORCID="0000-0002-5759-428X"))
 Description:
-    MedDRA data is used for defining adverse events in clinical studies.  You
+    MedDRA data is used for defining adverse events in clinical studies. You
     can load and merge the data for use in categorizing the adverse events
-    using this package.
+    using this package. The package requires the data licensed from MedDRA
+    <https://www.meddra.org/>.
 License: MIT + file LICENSE
 Suggests: 
     spelling,
