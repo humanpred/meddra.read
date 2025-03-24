@@ -16,3 +16,4 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: 
     dplyr
+URL: https://humanpred.github.io/meddra.read/
