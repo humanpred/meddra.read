@@ -55,6 +55,10 @@ colnames_meddra_files <-
     smq_list.asc = c("smq_code", "smq_name", "smq_level", "smq_description", "smq_source", "smq_note", "MedDRA_version", "status", "smq_algorithm"),
     # Table 3-12 in dist_file_format_25_1_English.pdf
     smq_content.asc = c("smq_code", "term_code", "term_level", "term_scope", "term_category", "term_weight", "term_status", "term_addition_version", "term_last_modified_version"),
+    # Table 3-10 in asciidoc.pdf from version 9.1
+    spec.asc = c("spec_code", "spec_name", "spec_abbrev"),
+    # Table 3-11 in asciidoc.pdf from version 9.1
+    spec_pt.asc = c("spec_code", "pt_code"),
 
     # Table 8-1 in dist_file_format_25_1_English.pdf
     llt.seq = c("llt_version_date", "llt_action_code", "llt_mod_fld_num", "llt_code", "llt_name", "pt_code", "llt_whoart_code", "llt_harts_code", "llt_costart_sym", "llt_icd9_code", "llt_icd9cm_code", "llt_icd10_code", "llt_currency", "llt_jart_code"),
@@ -75,7 +79,11 @@ colnames_meddra_files <-
     # Table 8-9 in dist_file_format_25_1_English.pdf
     mdhier.seq = c("md_version_date", "md_action_code", "md_mod_fld_num", "pt_code", "hlt_code", "hlgt_code", "soc_code", "pt_name", "hlt_name", "hlgt_name", "soc_name", "soc_abbrev", "null_field", "pt_soc_code", "primary_soc_fg"),
     # Table 8-10 in dist_file_format_25_1_English.pdf
-    intl_ord.seq = c("Intl_ord_version_date", "Intl_ord_action_code", "Intl_ord_mod_fld_num", "Intl_ord_code", "soc_code")
+    intl_ord.seq = c("Intl_ord_version_date", "Intl_ord_action_code", "Intl_ord_mod_fld_num", "Intl_ord_code", "soc_code"),
+    # Table 3-10 in conseq.pdf from version 9.1
+    spec.seq = c("spec_version_date", "spec_action_code", "spec_mod_fld_num", "spec_code", "spec_name", "spec_abbrev"),
+    # Table 3-11 in conseq.pdf from version 9.1
+    spec_pt.seq = c("sp_p_version_date", "sp_p_action_code", "sp_p_mod_fld_num", "spec_code", "pt_code")
   )
 
 meddra_data_in_last_column <- c("meddra_history_english.asc")
@@ -83,7 +91,7 @@ meddra_data_in_last_column <- c("meddra_history_english.asc")
 read_meddra_file <- function(filename) {
   # Assign names based on the column names from
   # dist_file_format_25_1_English.pdf
-  current_colnames <- colnames_meddra_files[[basename(filename)]]
+  current_colnames <- colnames_meddra_files[[tolower(basename(filename))]]
   if (is.null(current_colnames)) {
     stop("Could not find column names for ", filename) # nocov
   }
