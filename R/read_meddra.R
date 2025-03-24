@@ -99,6 +99,8 @@ meddra_data_in_last_column <-
     "meddra_history.asc"
   )
 
+meddra_data_in_last_column_maybe <- "SMQ_List.asc"
+
 read_meddra_file <- function(filename) {
   # Assign names based on the column names from
   # dist_file_format_25_1_English.pdf
@@ -137,6 +139,8 @@ read_meddra_file <- function(filename) {
     # do nothing
   } else if (nrow(ret) > 0 && all(is.na(ret[[ncol(ret)]]))) {
     ret[[ncol(ret)]] <- NULL
+  } else if (basename(filename) %in% meddra_data_in_last_column_maybe) {
+    warning("The last column is not NA in file: ", filename) # nocov
   } else if (nrow(ret) > 0) {
     stop("The last column should be NA in file: ", filename) # nocov
   }
