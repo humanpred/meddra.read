@@ -52,7 +52,7 @@ test_that("read_meddra", {
     )
   expect_warning(
     read_meddra(test_path("data/last_column_10.0")),
-    regexp = "The last column is not NA in file: tests/testthat/data/last_column_10.0/MedAscii/SMQ_List.asc"
+    regexp = "The last column is not NA in file: .*last_column_10.0/MedAscii/SMQ_List.asc"
   )
   expect_equal(
     suppressWarnings(read_meddra(test_path("data/last_column_10.0"))),
