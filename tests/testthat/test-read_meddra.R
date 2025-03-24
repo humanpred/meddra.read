@@ -66,4 +66,13 @@ test_that("read_meddra", {
     read_meddra(test_path("data/capitalization_9.1")),
     empty_example
   )
+  # Verify that directories are found
+  expect_error(
+    read_meddra(test_path("data/missing_asc")),
+    regexp = "MedAscii directory was not found"
+  )
+  expect_error(
+    read_meddra(test_path("data/missing_seq")),
+    regexp = "SeqAscii \\(or MedSeq\\) directory was not found"
+  )
 })
