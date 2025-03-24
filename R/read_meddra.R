@@ -5,11 +5,16 @@
 #' @return A list of data.frames for each file in the MedDRA source distribution
 #' @export
 read_meddra <- function(directory) {
-  if (!all(c("MedAscii", "SeqAscii") %in% list.dirs(path = directory, full.names = FALSE))) {
-    stop("MedAscii and SeqAscii directories were not found in ", directory)
+  dirs_available <- list.dirs(path = directory, full.names = FALSE)
+  medascii_dir <- intersect("MedAscii", dirs_available)
+  seqascii_dir <- intersect(c("SeqAscii", "MedSeq"), dirs_available)
+  if (length(medascii_dir) != 1) {
+    stop("MedAscii directory was not found in ", directory)
+  } else if (length(seqascii_dir) != 1) {
+    stop("SeqAscii (or MedSeq) directory was not found in ", directory)
   }
-  medascii_data <- read_meddra_dir(file.path(directory, "MedAscii"), extension = "asc")
-  seqascii_data <- read_meddra_dir(file.path(directory, "SeqAscii"), extension = "seq")
+  medascii_data <- read_meddra_dir(file.path(directory, medascii_dir), extension = "asc")
+  seqascii_data <- read_meddra_dir(file.path(directory, seqascii_dir), extension = "seq")
   append(medascii_data, seqascii_data)
 }
 
