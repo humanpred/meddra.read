@@ -11,7 +11,7 @@ read_meddra(directory)
 directories}
 }
 \value{
-A list of data.frames
+A list of data.frames for each file in the MedDRA source distribution
 }
 \description{
 Read MedDRA datasets from the source MedDRA datasets

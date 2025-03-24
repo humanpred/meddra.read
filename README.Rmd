@@ -18,7 +18,8 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN status](https://www.r-pkg.org/badges/version/meddra.read)](https://CRAN.R-project.org/package=meddra.read)
-[![R-CMD-check](https://github.com/billdenney/meddra.read/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/billdenney/meddra.read/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/humanpred/meddra.read/graph/badge.svg)](https://app.codecov.io/gh/humanpred/meddra.read)
+[![R-CMD-check](https://github.com/humanpred/meddra.read/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/humanpred/meddra.read/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of meddra.read is to read in the MedDRA source distribution files into
