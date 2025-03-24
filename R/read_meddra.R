@@ -21,7 +21,7 @@ read_meddra <- function(directory) {
 read_meddra_dir <- function(directory, extension) {
   files <- list.files(directory, full.names = TRUE, pattern = sprintf("\\.%s$", extension))
   stopifnot(length(files) > 0)
-  files <- setNames(files, basename(files))
+  files <- setNames(files, tolower(basename(files)))[order(tolower(basename(files)))]
   lapply(X = files, FUN = read_meddra_file)
 }
 
