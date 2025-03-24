@@ -32,6 +32,8 @@ colnames_meddra_files <-
   list(
     # Table 2-2 in dist_file_format_25_1_English.pdf
     meddra_history_english.asc = c("term_code", "term_name", "term_addition_version", "term_type", "llt_currency", "action"),
+    # Table 2-2 in ASCII_seq_datafiles_15_0_English.pdf (same as more recent _english version)
+    meddra_history.asc = c("term_code", "term_name", "term_addition_version", "term_type", "llt_currency", "action"),
     # Table 2-3 in dist_file_format_25_1_English.pdf
     meddra_release.asc = c("version", "language", "null_field", "null_field", "null_field"),
 
@@ -91,7 +93,11 @@ colnames_meddra_files <-
     spec_pt.seq = c("sp_p_version_date", "sp_p_action_code", "sp_p_mod_fld_num", "spec_code", "pt_code")
   )
 
-meddra_data_in_last_column <- c("meddra_history_english.asc")
+meddra_data_in_last_column <-
+  c(
+    "meddra_history_english.asc",
+    "meddra_history.asc"
+  )
 
 read_meddra_file <- function(filename) {
   # Assign names based on the column names from
