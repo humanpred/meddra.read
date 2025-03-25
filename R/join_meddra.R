@@ -4,6 +4,7 @@
 #' @return A data.frame with the "soc_code", "soc_name", "soc_abbrev",
 #'   "hlgt_code", "hlgt_name", "hlt_code", "hlt_name", "pt_code", "pt_name",
 #'   "pt_soc_code", "llt_code", "llt_name", and "llt_currency"
+#' @examples
 #' \dontrun{
 #' meddra_raw <- read_meddra("/path/to/meddra/distribution")
 #' meddra_df <- join_meddra(meddra_raw)
