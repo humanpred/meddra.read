@@ -3,6 +3,10 @@
 #' @param directory the directory containing the MedAscii and SeqAscii
 #'   directories
 #' @return A list of data.frames for each file in the MedDRA source distribution
+#' @examples
+#' \dontrun{
+#' read_meddra("/path/to/meddra/distribution")
+#' }
 #' @export
 read_meddra <- function(directory) {
   dirs_available <- list.dirs(path = directory, full.names = FALSE)
