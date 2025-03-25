@@ -16,3 +16,8 @@ A list of data.frames for each file in the MedDRA source distribution
 \description{
 Read MedDRA datasets from the source MedDRA datasets
 }
+\examples{
+\dontrun{
+read_meddra("/path/to/meddra/distribution")
+}
+}
