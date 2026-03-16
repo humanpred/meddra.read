@@ -8,7 +8,7 @@ files into a data.frame usable in R.
 You can install the development version of meddra.read like so:
 
 ``` r
-remotes::install_github("billdenney/meddra.read")
+remotes::install_github("humanpred/meddra.read")
 ```
 
 ## Example
