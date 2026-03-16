@@ -17,3 +17,9 @@ A data.frame with the "soc_code", "soc_name", "soc_abbrev",
 \description{
 Combine together all of the MedDRA terms into a single data.frame
 }
+\examples{
+\dontrun{
+meddra_raw <- read_meddra("/path/to/meddra/distribution")
+meddra_df <- join_meddra(meddra_raw)
+}
+}
