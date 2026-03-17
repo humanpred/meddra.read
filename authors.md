@@ -8,13 +8,13 @@
 ## Citation
 
 Denney B (2026). *meddra.read: Load and Use 'MedDRA' Data for Clinical
-Trials*. R package version 0.0.1,
+Trials*. R package version 0.0.1.9000,
 <https://humanpred.github.io/meddra.read/>.
 
     @Manual{,
       title = {meddra.read: Load and Use 'MedDRA' Data for Clinical Trials},
       author = {Bill Denney},
       year = {2026},
-      note = {R package version 0.0.1},
+      note = {R package version 0.0.1.9000},
       url = {https://humanpred.github.io/meddra.read/},
     }
