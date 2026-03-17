@@ -18,5 +18,7 @@ join_meddra <- function(data) {
   ret <- dplyr::left_join(ret, data$hlt_pt.asc, by = "hlt_code")
   ret <- dplyr::left_join(ret, data$pt.asc, by = "pt_code")
   ret <- dplyr::left_join(ret, data$llt.asc, by = "pt_code")
+  md_heir_prep <- data$mdhier.asc[, c("soc_code", "pt_soc_code", "pt_code", "primary_soc_fg")]
+  ret <- dplyr::left_join(ret, md_heir_prep, by = c("pt_code", "soc_code", "pt_soc_code"))
   ret
 }

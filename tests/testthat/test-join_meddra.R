@@ -8,7 +8,8 @@ test_that("join_meddra", {
       hlt.asc = data.frame(hlt_code = 3L, hlt_name = "solar system"),
       hlt_pt.asc = data.frame(hlt_code = 3L, pt_code = 4L),
       pt.asc = data.frame(pt_code = 4L, pt_name = "earth", pt_soc_code = 1L),
-      llt.asc = data.frame(llt_code = 5L, llt_name = "earth's core", pt_code = 4L, llt_currency = "Y")
+      llt.asc = data.frame(llt_code = 5L, llt_name = "earth's core", pt_code = 4L, llt_currency = "Y"),
+      mdhier.asc = data.frame(soc_code = 1L, pt_soc_code = 1L, pt_code = 1L, primary_soc_fg = "Y")
     )
   expect_s3_class(
     join_meddra(structured_data),
