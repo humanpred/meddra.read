@@ -1,7 +1,7 @@
 Package: meddra.read
 Title: Load and Use 'MedDRA' Data for Clinical Trials
-Version: 0.0.1
-Authors@R: 
+Version: 0.0.1.9000
+Authors@R:
     person("Bill", "Denney", email="wdenney@humanpredictions.com", role=c("aut", "cre"), comment=c(ORCID="0000-0002-5759-428X"))
 Description:
     'MedDRA' data is used for defining adverse events in clinical studies. You
@@ -9,9 +9,9 @@ Description:
     using this package. The package requires the data licensed from 'MedDRA'
     <https://www.meddra.org/>.
 License: MIT + file LICENSE
-Imports: 
+Imports:
     dplyr
-Suggests: 
+Suggests:
     spelling,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
