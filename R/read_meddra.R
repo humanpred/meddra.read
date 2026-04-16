@@ -4,9 +4,8 @@
 #'   directories
 #' @return A list of data.frames for each file in the MedDRA source distribution
 #' @examples
-#' \dontrun{
-#' read_meddra("/path/to/meddra/distribution")
-#' }
+#' example_dir <- system.file("example_meddra", package = "meddra.read")
+#' meddra_raw <- read_meddra(example_dir)
 #' @export
 read_meddra <- function(directory) {
   dirs_available <- list.dirs(path = directory, full.names = FALSE)
