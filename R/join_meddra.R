@@ -5,10 +5,9 @@
 #'   "hlgt_code", "hlgt_name", "hlt_code", "hlt_name", "pt_code", "pt_name",
 #'   "pt_soc_code", "llt_code", "llt_name", and "llt_currency"
 #' @examples
-#' \dontrun{
-#' meddra_raw <- read_meddra("/path/to/meddra/distribution")
+#' example_dir <- system.file("example_meddra", package = "meddra.read")
+#' meddra_raw <- read_meddra(example_dir)
 #' meddra_df <- join_meddra(meddra_raw)
-#' }
 #' @export
 join_meddra <- function(data) {
   ret <- dplyr::left_join(data$soc.asc, data$soc_hlgt.asc, by = "soc_code")

@@ -1,0 +1,173 @@
+---
+title: "Getting Started with meddra.read"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with meddra.read}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(meddra.read)
+```
+
+## What is MedDRA?
+
+MedDRA (Medical Dictionary for Regulatory Activities) is a standardized medical
+terminology used in clinical trials and regulatory submissions to classify
+adverse events. It is organized as a five-level hierarchy:
+
+| Level | Abbreviation | Description |
+|-------|-------------|-------------|
+| 1 (broadest) | SOC | System Organ Class |
+| 2 | HLGT | High Level Group Term |
+| 3 | HLT | High Level Term |
+| 4 | PT | Preferred Term |
+| 5 (most specific) | LLT | Lowest Level Term |
+
+MedDRA data is proprietary and requires a license from the
+[MedDRA MSSO](https://www.meddra.org/). This package helps you load and work
+with your licensed MedDRA data. The examples below use a small, clearly
+fictional dataset bundled with the package for illustration purposes.
+
+## MedDRA Distribution File Structure
+
+When you download a licensed MedDRA release, it contains two subdirectories:
+
+```
+my_meddra_release/
+├── MedAscii/          # Main MedDRA data files (.asc)
+│   ├── soc.asc        # System Organ Classes
+│   ├── hlgt.asc       # High Level Group Terms
+│   ├── hlt.asc        # High Level Terms
+│   ├── pt.asc         # Preferred Terms
+│   ├── llt.asc        # Lowest Level Terms
+│   ├── hlt_pt.asc     # HLT to PT linking table
+│   ├── hlgt_hlt.asc   # HLGT to HLT linking table
+│   ├── soc_hlgt.asc   # SOC to HLGT linking table
+│   ├── mdhier.asc     # Denormalized hierarchy
+│   ├── meddra_release.asc  # Version information
+│   └── ...            # Additional files (SMQ, specialties, etc.)
+└── SeqAscii/          # Sequential update files (.seq)
+    ├── soc.seq
+    ├── pt.seq
+    └── ...
+```
+
+All files use the `$` character as a field separator.
+
+## Reading MedDRA Data
+
+Use `read_meddra()` pointing to the parent directory that contains `MedAscii`
+and `SeqAscii` (or `MedSeq`) subdirectories. It returns a named list of
+data.frames, one per file.
+
+```{r read}
+# For your licensed data, replace this path with your actual MedDRA directory:
+# example_dir <- "/path/to/your/meddra/release"
+
+# The package includes a small fictional dataset for illustration:
+example_dir <- system.file("example_meddra", package = "meddra.read")
+
+meddra_raw <- read_meddra(example_dir)
+```
+
+The result is a named list with one data.frame per MedDRA file:
+
+```{r list-names}
+names(meddra_raw)
+```
+
+Each data.frame corresponds to one of the MedDRA source files. For example,
+the System Organ Class data:
+
+```{r soc}
+meddra_raw$soc.asc
+```
+
+The Preferred Terms:
+
+```{r pt}
+meddra_raw$pt.asc
+```
+
+The Lowest Level Terms (note: `llt_currency = "Y"` means the term is current;
+`"N"` means it is a non-current synonym):
+
+```{r llt}
+meddra_raw$llt.asc
+```
+
+## Joining into a Single Data Frame
+
+`join_meddra()` merges all the hierarchy tables into a single flat data.frame,
+making it easy to look up or filter by any level of the hierarchy:
+
+```{r join}
+meddra_df <- join_meddra(meddra_raw)
+meddra_df
+```
+
+The resulting data.frame has one row per LLT (Lowest Level Term) and includes
+all parent hierarchy levels. The columns are:
+
+| Column | Description |
+|--------|-------------|
+| `soc_code`, `soc_name`, `soc_abbrev` | System Organ Class |
+| `hlgt_code`, `hlgt_name` | High Level Group Term |
+| `hlt_code`, `hlt_name` | High Level Term |
+| `pt_code`, `pt_name`, `pt_soc_code` | Preferred Term |
+| `llt_code`, `llt_name`, `llt_currency` | Lowest Level Term |
+| `primary_soc_fg` | `"Y"` if this SOC is the primary (preferred) SOC for the PT |
+
+## Common Use Cases
+
+### Filter by System Organ Class
+
+To work with terms from a specific SOC:
+
+```{r filter-soc}
+subset(meddra_df, soc_name == "Example Nervous System Disorders")
+```
+
+### Find all LLTs for a Preferred Term
+
+To find all Lowest Level Terms (including non-current synonyms) for a given PT:
+
+```{r find-llts}
+subset(meddra_df, pt_name == "Example Headache", select = c(llt_code, llt_name, llt_currency))
+```
+
+### Keep only current LLTs
+
+Non-current LLTs (`llt_currency = "N"`) are historical synonyms. In most
+analyses you will want to keep only current terms:
+
+```{r current-only}
+current <- subset(meddra_df, llt_currency == "Y")
+current[, c("llt_name", "pt_name", "soc_abbrev")]
+```
+
+### Check the MedDRA version
+
+```{r version}
+meddra_raw$meddra_release.asc
+```
+
+## Working with SMQ Data
+
+Standardized MedDRA Queries (SMQs) are pre-defined sets of terms used to
+search for adverse events. The SMQ data is available in `smq_list.asc` and
+`smq_content.asc`:
+
+```{r smq}
+meddra_raw$smq_list.asc
+meddra_raw$smq_content.asc
+```
