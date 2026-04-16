@@ -32,3 +32,9 @@ meddra_data <- join_meddra(meddra_raw)
 - [`read_meddra()`](https://humanpred.github.io/meddra.read/reference/read_meddra.md)
   : Read MedDRA datasets from the source MedDRA datasets
 
+# Articles
+
+### All vignettes
+
+- [Getting Started with
+  meddra.read](https://humanpred.github.io/meddra.read/articles/meddra-read.md):
