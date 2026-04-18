@@ -21,7 +21,6 @@ A list of data.frames for each file in the MedDRA source distribution
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-read_meddra("/path/to/meddra/distribution")
-} # }
+example_dir <- system.file("example_meddra", package = "meddra.read")
+meddra_raw <- read_meddra(example_dir)
 ```

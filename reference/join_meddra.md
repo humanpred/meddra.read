@@ -24,8 +24,7 @@ A data.frame with the "soc_code", "soc_name", "soc_abbrev", "hlgt_code",
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-meddra_raw <- read_meddra("/path/to/meddra/distribution")
+example_dir <- system.file("example_meddra", package = "meddra.read")
+meddra_raw <- read_meddra(example_dir)
 meddra_df <- join_meddra(meddra_raw)
-} # }
 ```
