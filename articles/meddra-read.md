@@ -1,6 +1,7 @@
 # Getting Started with meddra.read
 
 ``` r
+
 library(meddra.read)
 ```
 
@@ -57,6 +58,7 @@ pointing to the parent directory that contains `MedAscii` and `SeqAscii`
 one per file.
 
 ``` r
+
 # For your licensed data, replace this path with your actual MedDRA directory:
 # example_dir <- "/path/to/your/meddra/release"
 
@@ -69,6 +71,7 @@ meddra_raw <- read_meddra(example_dir)
 The result is a named list with one data.frame per MedDRA file:
 
 ``` r
+
 names(meddra_raw)
 #>  [1] "hlgt_hlt.asc"               "hlgt.asc"                  
 #>  [3] "hlt_pt.asc"                 "hlt.asc"                   
@@ -90,6 +93,7 @@ Each data.frame corresponds to one of the MedDRA source files. For
 example, the System Organ Class data:
 
 ``` r
+
 meddra_raw$soc.asc
 #>   soc_code                         soc_name soc_abbrev
 #> 1 10000100 Example Nervous System Disorders       ExNS
@@ -99,6 +103,7 @@ meddra_raw$soc.asc
 The Preferred Terms:
 
 ``` r
+
 meddra_raw$pt.asc
 #>    pt_code              pt_name pt_soc_code
 #> 1 10001111     Example Headache    10000100
@@ -109,6 +114,7 @@ The Lowest Level Terms (note: `llt_currency = "Y"` means the term is
 current; `"N"` means it is a non-current synonym):
 
 ``` r
+
 meddra_raw$llt.asc
 #>   llt_code             llt_name  pt_code llt_currency
 #> 1 10001111     Example Headache 10001111            Y
@@ -123,6 +129,7 @@ merges all the hierarchy tables into a single flat data.frame, making it
 easy to look up or filter by any level of the hierarchy:
 
 ``` r
+
 meddra_df <- join_meddra(meddra_raw)
 meddra_df
 #>   soc_code                         soc_name soc_abbrev hlgt_code
@@ -146,14 +153,14 @@ meddra_df
 The resulting data.frame has one row per LLT (Lowest Level Term) and
 includes all parent hierarchy levels. The columns are:
 
-| Column                                 | Description                                                 |
-|----------------------------------------|-------------------------------------------------------------|
-| `soc_code`, `soc_name`, `soc_abbrev`   | System Organ Class                                          |
-| `hlgt_code`, `hlgt_name`               | High Level Group Term                                       |
-| `hlt_code`, `hlt_name`                 | High Level Term                                             |
-| `pt_code`, `pt_name`, `pt_soc_code`    | Preferred Term                                              |
-| `llt_code`, `llt_name`, `llt_currency` | Lowest Level Term                                           |
-| `primary_soc_fg`                       | `"Y"` if this SOC is the primary (preferred) SOC for the PT |
+| Column | Description |
+|----|----|
+| `soc_code`, `soc_name`, `soc_abbrev` | System Organ Class |
+| `hlgt_code`, `hlgt_name` | High Level Group Term |
+| `hlt_code`, `hlt_name` | High Level Term |
+| `pt_code`, `pt_name`, `pt_soc_code` | Preferred Term |
+| `llt_code`, `llt_name`, `llt_currency` | Lowest Level Term |
+| `primary_soc_fg` | `"Y"` if this SOC is the primary (preferred) SOC for the PT |
 
 ## Common Use Cases
 
@@ -162,6 +169,7 @@ includes all parent hierarchy levels. The columns are:
 To work with terms from a specific SOC:
 
 ``` r
+
 subset(meddra_df, soc_name == "Example Nervous System Disorders")
 #>   soc_code                         soc_name soc_abbrev hlgt_code
 #> 1 10000100 Example Nervous System Disorders       ExNS  10001100
@@ -183,6 +191,7 @@ To find all Lowest Level Terms (including non-current synonyms) for a
 given PT:
 
 ``` r
+
 subset(meddra_df, pt_name == "Example Headache", select = c(llt_code, llt_name, llt_currency))
 #>   llt_code          llt_name llt_currency
 #> 1 10001111  Example Headache            Y
@@ -195,6 +204,7 @@ Non-current LLTs (`llt_currency = "N"`) are historical synonyms. In most
 analyses you will want to keep only current terms:
 
 ``` r
+
 current <- subset(meddra_df, llt_currency == "Y")
 current[, c("llt_name", "pt_name", "soc_abbrev")]
 #>               llt_name              pt_name soc_abbrev
@@ -205,6 +215,7 @@ current[, c("llt_name", "pt_name", "soc_abbrev")]
 ### Check the MedDRA version
 
 ``` r
+
 meddra_raw$meddra_release.asc
 #>   version language
 #> 1       0  English
@@ -217,6 +228,7 @@ search for adverse events. The SMQ data is available in `smq_list.asc`
 and `smq_content.asc`:
 
 ``` r
+
 meddra_raw$smq_list.asc
 #>   smq_code             smq_name smq_level
 #> 1 10000001 Example Headache SMQ         2
