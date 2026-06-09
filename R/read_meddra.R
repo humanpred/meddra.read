@@ -4,8 +4,19 @@
 #'   directories
 #' @return A list of data.frames for each file in the MedDRA source distribution
 #' @examples
+#' # The package bundles a small fictional MedDRA dataset for illustration.
+#' # For real work, replace this with the path to your licensed MedDRA release.
 #' example_dir <- system.file("example_meddra", package = "meddra.read")
+#'
 #' meddra_raw <- read_meddra(example_dir)
+#'
+#' # The result is a named list of data.frames, one per MedDRA source file
+#' names(meddra_raw)
+#'
+#' # Each component mirrors the schema of its MedDRA source file
+#' meddra_raw$soc.asc
+#' meddra_raw$pt.asc
+#' meddra_raw$llt.asc
 #' @export
 read_meddra <- function(directory) {
   dirs_available <- list.dirs(path = directory, full.names = FALSE)

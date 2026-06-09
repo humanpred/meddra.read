@@ -18,7 +18,16 @@ A data.frame with the "soc_code", "soc_name", "soc_abbrev",
 Combine together all of the MedDRA terms into a single data.frame
 }
 \examples{
+# The package bundles a small fictional MedDRA dataset for illustration.
+# For real work, replace this with the path to your licensed MedDRA release.
 example_dir <- system.file("example_meddra", package = "meddra.read")
 meddra_raw <- read_meddra(example_dir)
+
+# Flatten the SOC -> HLGT -> HLT -> PT -> LLT hierarchy into one data.frame,
+# one row per LLT, with all parent hierarchy levels on each row.
 meddra_df <- join_meddra(meddra_raw)
+meddra_df
+
+# Typical follow-on: drop non-current LLT synonyms.
+subset(meddra_df, llt_currency == "Y")
 }
