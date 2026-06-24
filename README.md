@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# meddra.read
+# meddra.read <a href="https://humanpred.github.io/meddra.read/"><img src="man/figures/logo.svg" align="right" height="139" alt="meddra.read website" /></a>
 
 <!-- badges: start -->
 

@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# meddra.read
+# meddra.read <a href="https://humanpred.github.io/meddra.read/"><img src="man/figures/logo.svg" align="right" height="139" alt="meddra.read website" /></a>
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
