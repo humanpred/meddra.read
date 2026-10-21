@@ -61,6 +61,17 @@ release metadata, history) without paying for the join.
   hlt_pt → pt → llt`, then a final join against a 4-column subset of
   `mdhier.asc` keyed on `(pt_code, soc_code, pt_soc_code)` to attach
   `primary_soc_fg`.
+- `R/join_smq.R` — `join_smq(data)` exported. Expands every SMQ into one row
+  per LLT with the full hierarchy. Reuses `join_meddra()` for the hierarchy,
+  then `inner_join`s SMQ members onto it: PT members (`term_level == 4`) by
+  `pt_code` (→ all LLTs of the PT), LLT members (`term_level == 5`) by
+  `llt_code`. `inner_join` (not `left_join`) so orphan terms with no hierarchy
+  match are dropped rather than emitting all-NA rows.
+- `R/join_smq.R` — `flatten_smq_content()` / `flatten_smq_one()` internal.
+  Recursively resolve sub-SMQ references (`term_level == 0`, where `term_code`
+  is a child `smq_code`) to PT/LLT-only rows via an iterative, cycle-safe
+  worklist; relabel kept rows to the top-level `smq_code`. **This is where the
+  SMQ expansion logic lives.**
 
 ## MedDRA domain crib sheet
 
@@ -85,7 +96,12 @@ Other concepts:
   downstream analyses filter to `"Y"`.
 - **SMQ** = Standardised MedDRA Query — curated term groupings for safety
   analysis. Lives in `smq_list.asc` (definitions) and `smq_content.asc`
-  (term membership). Not joined into `join_meddra()` output.
+  (term membership). Not joined into `join_meddra()` output; use `join_smq()`
+  to expand them into per-LLT rows. In `smq_content.asc`: `term_level` is
+  **4 = PT**, **5 = LLT**, **0 = sub-SMQ** (then `term_code` is a child
+  `smq_code`, resolved recursively); `term_scope` is **1 = broad**,
+  **2 = narrow**. SMQs are defined at the PT level, so PT members expand down
+  to all their LLTs for merging against LLT-coded adverse events.
 - **Specialties** (`spec.asc`, `spec_pt.asc`) — alternate cross-cuts of PTs.
   Not joined into `join_meddra()` output.
 
@@ -192,6 +208,11 @@ by tests** — keep the two separate.
 - **Extend `join_meddra()` output** — add the `left_join` step; update the
   `@return` roxygen block in `R/join_meddra.R`; update the output-column
   section in `vignettes/meddra-read.Rmd`; add to `NEWS.md`.
+- **Change `join_smq()` output** — keep the `col_order`/`member_cols` vectors,
+  the `@return` roxygen block in `R/join_smq.R`, the vignette "Expanding an SMQ
+  into dictionary terms" section (incl. the SAS/ADaM rename table), and
+  `NEWS.md` in sync. Tests live in `tests/testthat/test-join_smq.R` (inline
+  fixtures, not the `data/` directory).
 - **Support a new MedDRA version** — diff the new format-doc PDF against
   `colnames_meddra_files`; update column lists and the spec-section
   comments; add a versioned fixture (`tests/testthat/data/<feature>_<ver>/`)
