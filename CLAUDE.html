@@ -74,6 +74,11 @@
 <code>R/read_meddra.R:107</code> — <code>read_meddra_file(filename)</code> internal. Parses one file: handles empty files, missing trailing newlines, last-column quirks, legacy <code>+</code> columns, and <code>null_field</code> placeholders.</li>
 <li>
 <code>R/join_meddra.R:12</code> — <code>join_meddra(data)</code> exported. Eight chained <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">dplyr::left_join</a></code>s through <code>soc → soc_hlgt → hlgt → hlgt_hlt → hlt → hlt_pt → pt → llt</code>, then a final join against a 4-column subset of <code>mdhier.asc</code> keyed on <code>(pt_code, soc_code, pt_soc_code)</code> to attach <code>primary_soc_fg</code>.</li>
+<li>
+<code>R/join_smq.R</code> — <code>join_smq(data)</code> exported. Expands every SMQ into one row per LLT with the full hierarchy. Reuses <code><a href="reference/join_meddra.html">join_meddra()</a></code> for the hierarchy, then <code>inner_join</code>s SMQ members onto it: PT members (<code>term_level == 4</code>) by <code>pt_code</code> (→ all LLTs of the PT), LLT members (<code>term_level == 5</code>) by <code>llt_code</code>. <code>inner_join</code> (not <code>left_join</code>) so orphan terms with no hierarchy match are dropped rather than emitting all-NA rows.</li>
+<li>
+<code>R/join_smq.R</code> — <code>flatten_smq_content()</code> / <code>flatten_smq_one()</code> internal. Recursively resolve sub-SMQ references (<code>term_level == 0</code>, where <code>term_code</code> is a child <code>smq_code</code>) to PT/LLT-only rows via an iterative, cycle-safe worklist; relabel kept rows to the top-level <code>smq_code</code>. <strong>This is where the SMQ expansion logic lives.</strong>
+</li>
 </ul></div>
 <div class="section level2">
 <h2 id="meddra-domain-crib-sheet">MedDRA domain crib sheet<a class="anchor" aria-label="anchor" href="#meddra-domain-crib-sheet"></a></h2>
@@ -101,7 +106,7 @@
 <li>
 <code>llt_currency = "Y"/"N"</code> — whether an LLT is currently in use. Most downstream analyses filter to <code>"Y"</code>.</li>
 <li>
-<strong>SMQ</strong> = Standardised MedDRA Query — curated term groupings for safety analysis. Lives in <code>smq_list.asc</code> (definitions) and <code>smq_content.asc</code> (term membership). Not joined into <code><a href="reference/join_meddra.html">join_meddra()</a></code> output.</li>
+<strong>SMQ</strong> = Standardised MedDRA Query — curated term groupings for safety analysis. Lives in <code>smq_list.asc</code> (definitions) and <code>smq_content.asc</code> (term membership). Not joined into <code><a href="reference/join_meddra.html">join_meddra()</a></code> output; use <code><a href="reference/join_smq.html">join_smq()</a></code> to expand them into per-LLT rows. In <code>smq_content.asc</code>: <code>term_level</code> is <strong>4 = PT</strong>, <strong>5 = LLT</strong>, <strong>0 = sub-SMQ</strong> (then <code>term_code</code> is a child <code>smq_code</code>, resolved recursively); <code>term_scope</code> is <strong>1 = broad</strong>, <strong>2 = narrow</strong>. SMQs are defined at the PT level, so PT members expand down to all their LLTs for merging against LLT-coded adverse events.</li>
 <li>
 <strong>Specialties</strong> (<code>spec.asc</code>, <code>spec_pt.asc</code>) — alternate cross-cuts of PTs. Not joined into <code><a href="reference/join_meddra.html">join_meddra()</a></code> output.</li>
 </ul><p>File-set roles:</p>
@@ -197,6 +202,8 @@
 <li>
 <strong>Extend <code><a href="reference/join_meddra.html">join_meddra()</a></code> output</strong> — add the <code>left_join</code> step; update the <code>@return</code> roxygen block in <code>R/join_meddra.R</code>; update the output-column section in <code>vignettes/meddra-read.Rmd</code>; add to <code>NEWS.md</code>.</li>
 <li>
+<strong>Change <code><a href="reference/join_smq.html">join_smq()</a></code> output</strong> — keep the <code>col_order</code>/<code>member_cols</code> vectors, the <code>@return</code> roxygen block in <code>R/join_smq.R</code>, the vignette “Expanding an SMQ into dictionary terms” section (incl. the SAS/ADaM rename table), and <code>NEWS.md</code> in sync. Tests live in <code>tests/testthat/test-join_smq.R</code> (inline fixtures, not the <code>data/</code> directory).</li>
+<li>
 <strong>Support a new MedDRA version</strong> — diff the new format-doc PDF against <code>colnames_meddra_files</code>; update column lists and the spec-section comments; add a versioned fixture (<code>tests/testthat/data/&lt;feature&gt;_&lt;ver&gt;/</code>) if parsing behavior diverges.</li>
 <li>
 <strong>Pre-commit checklist</strong> — if roxygen comments or function signatures changed: <code>devtools::document()</code> and stage updated <code>NAMESPACE</code> / <code>man/</code>. If exports / deps / docs changed: <code>devtools::check()</code>. Update <code>NEWS.md</code> for user-facing changes (once version &gt; 0.0.1).</li>
@@ -217,7 +224,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

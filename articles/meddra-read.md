@@ -242,3 +242,87 @@ meddra_raw$smq_content.asc
 #>   term_status term_addition_version term_last_modified_version
 #> 1           A                     0                          0
 ```
+
+### Expanding an SMQ into dictionary terms
+
+`smq_content.asc` lists SMQ members at the Preferred Term level (with a
+broad or narrow scope), and some SMQs are hierarchical, referencing
+subordinate SMQs. Adverse events, however, are coded at the Lowest Level
+Term level.
+[`join_smq()`](https://humanpred.github.io/meddra.read/reference/join_smq.md)
+bridges that gap: it resolves sub-SMQs recursively, expands each
+Preferred Term down to all of its LLTs, and attaches the full hierarchy
+(via
+[`join_meddra()`](https://humanpred.github.io/meddra.read/reference/join_meddra.md)),
+giving you the term list needed to merge against coded adverse events
+and to build SMQ\* or CQ\* flags.
+
+``` r
+
+smq_df <- join_smq(meddra_raw)
+smq_df
+#>   smq_code             smq_name smq_level term_scope term_category term_weight
+#> 1 10000001 Example Headache SMQ         2          1             A           0
+#> 2 10000001 Example Headache SMQ         2          1             A           0
+#>   term_status soc_code                         soc_name soc_abbrev hlgt_code
+#> 1           A 10000100 Example Nervous System Disorders       ExNS  10001100
+#> 2           A 10000100 Example Nervous System Disorders       ExNS  10001100
+#>                        hlgt_name hlt_code                   hlt_name  pt_code
+#> 1 Example Neurological Disorders 10001110 Example Headache Disorders 10001111
+#> 2 Example Neurological Disorders 10001110 Example Headache Disorders 10001111
+#>            pt_name pt_soc_code llt_code          llt_name llt_currency
+#> 1 Example Headache    10000100 10001111  Example Headache            Y
+#> 2 Example Headache    10000100 10001112 Example Head Pain            N
+#>   primary_soc_fg
+#> 1              Y
+#> 2              Y
+```
+
+The result has one row per (SMQ × Lowest Level Term × SOC path).
+`term_scope` is `1` (broad) or `2` (narrow). A common follow-on keeps
+only broad-scope, current LLTs:
+
+``` r
+
+subset(smq_df, term_scope == 1 & llt_currency == "Y")
+#>   smq_code             smq_name smq_level term_scope term_category term_weight
+#> 1 10000001 Example Headache SMQ         2          1             A           0
+#>   term_status soc_code                         soc_name soc_abbrev hlgt_code
+#> 1           A 10000100 Example Nervous System Disorders       ExNS  10001100
+#>                        hlgt_name hlt_code                   hlt_name  pt_code
+#> 1 Example Neurological Disorders 10001110 Example Headache Disorders 10001111
+#>            pt_name pt_soc_code llt_code         llt_name llt_currency
+#> 1 Example Headache    10000100 10001111 Example Headache            Y
+#>   primary_soc_fg
+#> 1              Y
+```
+
+The columns use the same `snake_case` names as
+[`join_meddra()`](https://humanpred.github.io/meddra.read/reference/join_meddra.md).
+If you need the short SAS/ADaM variable names often used in clinical SMQ
+derivation, rename them:
+
+| [`join_smq()`](https://humanpred.github.io/meddra.read/reference/join_smq.md) column | SAS/ADaM |  | [`join_smq()`](https://humanpred.github.io/meddra.read/reference/join_smq.md) column | SAS/ADaM |
+|----|----|----|----|----|
+| `soc_code` | `soccd` |  | `pt_code` | `ptcd` |
+| `soc_name` | `soc` |  | `pt_name` | `pt` |
+| `hlgt_code` | `hlgtcd` |  | `llt_code` | `lltcd` |
+| `hlgt_name` | `hlgt` |  | `llt_name` | `llt` |
+| `hlt_code` | `hltcd` |  |  |  |
+| `hlt_name` | `hlt` |  |  |  |
+
+``` r
+
+old <- c("soc_code", "soc_name", "hlgt_code", "hlgt_name", "hlt_code",
+         "hlt_name", "pt_code", "pt_name", "llt_code", "llt_name")
+new <- c("soccd", "soc", "hlgtcd", "hlgt", "hltcd", "hlt", "ptcd", "pt",
+         "lltcd", "llt")
+names(smq_df)[match(old, names(smq_df))] <- new
+names(smq_df)
+#>  [1] "smq_code"       "smq_name"       "smq_level"      "term_scope"    
+#>  [5] "term_category"  "term_weight"    "term_status"    "soccd"         
+#>  [9] "soc"            "soc_abbrev"     "hlgtcd"         "hlgt"          
+#> [13] "hltcd"          "hlt"            "ptcd"           "pt"            
+#> [17] "pt_soc_code"    "lltcd"          "llt"            "llt_currency"  
+#> [21] "primary_soc_fg"
+```

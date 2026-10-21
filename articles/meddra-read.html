@@ -342,6 +342,122 @@ to search for adverse events. The SMQ data is available in
 <span><span class="co">#&gt; 1 10000001  10001111          4          1             A           0</span></span>
 <span><span class="co">#&gt;   term_status term_addition_version term_last_modified_version</span></span>
 <span><span class="co">#&gt; 1           A                     0                          0</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="expanding-an-smq-into-dictionary-terms">Expanding an SMQ into dictionary terms<a class="anchor" aria-label="anchor" href="#expanding-an-smq-into-dictionary-terms"></a>
+</h3>
+<p><code>smq_content.asc</code> lists SMQ members at the Preferred Term
+level (with a broad or narrow scope), and some SMQs are hierarchical,
+referencing subordinate SMQs. Adverse events, however, are coded at the
+Lowest Level Term level. <code><a href="../reference/join_smq.html">join_smq()</a></code> bridges that gap: it
+resolves sub-SMQs recursively, expands each Preferred Term down to all
+of its LLTs, and attaches the full hierarchy (via
+<code><a href="../reference/join_meddra.html">join_meddra()</a></code>), giving you the term list needed to merge
+against coded adverse events and to build SMQ* or CQ* flags.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">smq_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/join_smq.html">join_smq</a></span><span class="op">(</span><span class="va">meddra_raw</span><span class="op">)</span></span>
+<span><span class="va">smq_df</span></span>
+<span><span class="co">#&gt;   smq_code             smq_name smq_level term_scope term_category term_weight</span></span>
+<span><span class="co">#&gt; 1 10000001 Example Headache SMQ         2          1             A           0</span></span>
+<span><span class="co">#&gt; 2 10000001 Example Headache SMQ         2          1             A           0</span></span>
+<span><span class="co">#&gt;   term_status soc_code                         soc_name soc_abbrev hlgt_code</span></span>
+<span><span class="co">#&gt; 1           A 10000100 Example Nervous System Disorders       ExNS  10001100</span></span>
+<span><span class="co">#&gt; 2           A 10000100 Example Nervous System Disorders       ExNS  10001100</span></span>
+<span><span class="co">#&gt;                        hlgt_name hlt_code                   hlt_name  pt_code</span></span>
+<span><span class="co">#&gt; 1 Example Neurological Disorders 10001110 Example Headache Disorders 10001111</span></span>
+<span><span class="co">#&gt; 2 Example Neurological Disorders 10001110 Example Headache Disorders 10001111</span></span>
+<span><span class="co">#&gt;            pt_name pt_soc_code llt_code          llt_name llt_currency</span></span>
+<span><span class="co">#&gt; 1 Example Headache    10000100 10001111  Example Headache            Y</span></span>
+<span><span class="co">#&gt; 2 Example Headache    10000100 10001112 Example Head Pain            N</span></span>
+<span><span class="co">#&gt;   primary_soc_fg</span></span>
+<span><span class="co">#&gt; 1              Y</span></span>
+<span><span class="co">#&gt; 2              Y</span></span></code></pre></div>
+<p>The result has one row per (SMQ × Lowest Level Term × SOC path).
+<code>term_scope</code> is <code>1</code> (broad) or <code>2</code>
+(narrow). A common follow-on keeps only broad-scope, current LLTs:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">smq_df</span>, <span class="va">term_scope</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="va">llt_currency</span> <span class="op">==</span> <span class="st">"Y"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   smq_code             smq_name smq_level term_scope term_category term_weight</span></span>
+<span><span class="co">#&gt; 1 10000001 Example Headache SMQ         2          1             A           0</span></span>
+<span><span class="co">#&gt;   term_status soc_code                         soc_name soc_abbrev hlgt_code</span></span>
+<span><span class="co">#&gt; 1           A 10000100 Example Nervous System Disorders       ExNS  10001100</span></span>
+<span><span class="co">#&gt;                        hlgt_name hlt_code                   hlt_name  pt_code</span></span>
+<span><span class="co">#&gt; 1 Example Neurological Disorders 10001110 Example Headache Disorders 10001111</span></span>
+<span><span class="co">#&gt;            pt_name pt_soc_code llt_code         llt_name llt_currency</span></span>
+<span><span class="co">#&gt; 1 Example Headache    10000100 10001111 Example Headache            Y</span></span>
+<span><span class="co">#&gt;   primary_soc_fg</span></span>
+<span><span class="co">#&gt; 1              Y</span></span></code></pre></div>
+<p>The columns use the same <code>snake_case</code> names as
+<code><a href="../reference/join_meddra.html">join_meddra()</a></code>. If you need the short SAS/ADaM variable
+names often used in clinical SMQ derivation, rename them:</p>
+<table class="table">
+<thead><tr class="header">
+<th>
+<code><a href="../reference/join_smq.html">join_smq()</a></code> column</th>
+<th>SAS/ADaM</th>
+<th></th>
+<th>
+<code><a href="../reference/join_smq.html">join_smq()</a></code> column</th>
+<th>SAS/ADaM</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>soc_code</code></td>
+<td><code>soccd</code></td>
+<td></td>
+<td><code>pt_code</code></td>
+<td><code>ptcd</code></td>
+</tr>
+<tr class="even">
+<td><code>soc_name</code></td>
+<td><code>soc</code></td>
+<td></td>
+<td><code>pt_name</code></td>
+<td><code>pt</code></td>
+</tr>
+<tr class="odd">
+<td><code>hlgt_code</code></td>
+<td><code>hlgtcd</code></td>
+<td></td>
+<td><code>llt_code</code></td>
+<td><code>lltcd</code></td>
+</tr>
+<tr class="even">
+<td><code>hlgt_name</code></td>
+<td><code>hlgt</code></td>
+<td></td>
+<td><code>llt_name</code></td>
+<td><code>llt</code></td>
+</tr>
+<tr class="odd">
+<td><code>hlt_code</code></td>
+<td><code>hltcd</code></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>hlt_name</code></td>
+<td><code>hlt</code></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">old</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"soc_code"</span>, <span class="st">"soc_name"</span>, <span class="st">"hlgt_code"</span>, <span class="st">"hlgt_name"</span>, <span class="st">"hlt_code"</span>,</span>
+<span>         <span class="st">"hlt_name"</span>, <span class="st">"pt_code"</span>, <span class="st">"pt_name"</span>, <span class="st">"llt_code"</span>, <span class="st">"llt_name"</span><span class="op">)</span></span>
+<span><span class="va">new</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"soccd"</span>, <span class="st">"soc"</span>, <span class="st">"hlgtcd"</span>, <span class="st">"hlgt"</span>, <span class="st">"hltcd"</span>, <span class="st">"hlt"</span>, <span class="st">"ptcd"</span>, <span class="st">"pt"</span>,</span>
+<span>         <span class="st">"lltcd"</span>, <span class="st">"llt"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">smq_df</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">old</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">smq_df</span><span class="op">)</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">new</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">smq_df</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "smq_code"       "smq_name"       "smq_level"      "term_scope"    </span></span>
+<span><span class="co">#&gt;  [5] "term_category"  "term_weight"    "term_status"    "soccd"         </span></span>
+<span><span class="co">#&gt;  [9] "soc"            "soc_abbrev"     "hlgtcd"         "hlgt"          </span></span>
+<span><span class="co">#&gt; [13] "hltcd"          "hlt"            "ptcd"           "pt"            </span></span>
+<span><span class="co">#&gt; [17] "pt_soc_code"    "lltcd"          "llt"            "llt_currency"  </span></span>
+<span><span class="co">#&gt; [21] "primary_soc_fg"</span></span></code></pre></div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -354,7 +470,7 @@ to search for adverse events. The SMQ data is available in
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>
